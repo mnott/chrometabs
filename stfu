@@ -1,0 +1,39 @@
+#!/bin/bash
+# stfu - Shutdown Countdown (Test Mode - No actual shutdown)
+
+# Sound alert
+say "battery critical, shutting down" &
+
+# Show full-screen dialog countdown using AppleScript
+osascript <<'EOF'
+set timeLeft to 10
+repeat while timeLeft > 0
+    set buttonClicked to "timeout"
+
+    try
+        set dialogResult to display alert "⚠️ BATTERY CRITICAL ⚠️" message "System will shutdown in " & timeLeft & " seconds!" & return & return & "Press Cancel to abort shutdown." buttons {"Cancel"} default button 1 giving up after 1 as critical
+
+        -- If user clicked Cancel before timeout
+        if button returned of dialogResult is "Cancel" then
+            display notification "Shutdown cancelled by user" with title "Shutdown Aborted"
+            error number -128
+        end if
+    end try
+
+    -- Audio countdown for last 5 seconds
+    if timeLeft ≤ 5 then
+        say (timeLeft as string)
+    end if
+
+    set timeLeft to timeLeft - 1
+end repeat
+
+-- Final warning
+display alert "🔌 SHUTTING DOWN NOW 🔌" message "System is shutting down..." buttons {} giving up after 2 as critical
+say "shutting down now"
+delay 1
+
+-- Actually shutdown now
+do shell script "shutdown -h now" with administrator privileges
+
+EOF
