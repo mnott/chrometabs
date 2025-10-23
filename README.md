@@ -53,5 +53,33 @@ If this returns an error about permissions, follow the steps above.
 
 ## Commands
 
-- list: Display all open Chrome tabs
-- close: Close specific tab(s) by window and tab number
+- `list`: Display all open Chrome tabs
+- `close`: Close specific tab(s) by window and tab number
+- `check-permissions`: Check and trigger automation permissions
+
+### Examples
+
+```bash
+# List all tabs
+chrometabs list
+
+# Check permissions
+chrometabs check-permissions
+
+# Close specific tabs
+chrometabs close 1 3 5        # Close tabs 3 and 5 in window 1
+chrometabs close 2 1 --all    # Close all tabs in window 2
+```
+
+## Troubleshooting
+
+If `chrometabs list` shows no tabs but `osascript` works directly, Python needs automation permissions:
+
+```bash
+# Check permission status
+chrometabs check-permissions
+
+# This will show which Python needs permission and guide you through System Settings
+```
+
+**Why this happens:** When you run `osascript` directly, your Terminal has permission. When Python runs `osascript`, **Python itself** needs the permission
